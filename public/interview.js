@@ -15,7 +15,13 @@ const questions = [
     "What are your greatest strengths and how do they apply to this role?",
     "Describe a challenging situation you faced and how you overcame it.",
     "Where do you see yourself in 5 years?",
+    "Tell us about a time when you had to work in a team. What was your role?",
     "Why should we hire you for this position?",
+    "What do you know about our company and industry?",
+    "Describe your experience with this technology/skill.",
+    "How do you handle stress and tight deadlines?",
+    "What's a project you're proud of? Tell us about your role.",
+    "Why did you leave your last job?",
     "Do you have any questions for us?"
 ];
 

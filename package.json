@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "install-deps": "npm install"
+    "setup": "node setup.js",
+    "install-deps": "npm install",
+    "test": "echo \"Run interviews to test\" && exit 0"
   },
   "keywords": ["ai", "interview", "coaching", "speech-analysis", "facial-recognition"],
   "author": "AI Interview Coach Team",
