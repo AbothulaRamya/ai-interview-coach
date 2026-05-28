@@ -56,7 +56,18 @@ export const analyzeVideo = async (req, res) => {
         error: "Failed to process video file" 
       });
     }
-    
+
+    const rawEmotionData = req.body?.emotionData || null;
+    let parsedEmotionData = null;
+
+    if (rawEmotionData) {
+      try {
+        parsedEmotionData = JSON.parse(rawEmotionData);
+      } catch (parseError) {
+        console.warn('⚠️ Invalid emotion data provided:', parseError.message);
+      }
+    }
+
     if (openai && audioQuality === 'high') {
       try {
         console.log('🎤 Processing audio with OpenAI Whisper...');
@@ -67,7 +78,7 @@ export const analyzeVideo = async (req, res) => {
           response_format: "text",
           temperature: 0.0
         });
-        transcript = transcription;
+        transcript = transcription?.text || transcription;
         transcriptionQuality = 'high';
         console.log('✅ Transcription completed with OpenAI Whisper');
         console.log('📝 Transcript length:', transcript.length, 'characters');
@@ -85,8 +96,24 @@ export const analyzeVideo = async (req, res) => {
     // 3. Analyze speech patterns
     const speechAnalysis = analyzeSpeechPatterns(transcript);
     
-    // 4. Simulate emotion analysis (in a real app, you'd use face-api.js or similar)
-    const emotionAnalysis = simulateEmotionAnalysis();
+    // 4. Emotion analysis
+    let emotionAnalysis;
+    if (Array.isArray(parsedEmotionData) && parsedEmotionData.length > 0) {
+      const emotions = parsedEmotionData.map(entry => ({
+        timestamp: entry.timestamp || 0,
+        emotion: entry.emotion || 'neutral',
+        confidence: typeof entry.confidence === 'number' ? entry.confidence : 0.75
+      }));
+      const averageConfidence = emotions.reduce((sum, item) => sum + item.confidence, 0) / emotions.length;
+      emotionAnalysis = {
+        emotions,
+        averageConfidence
+      };
+      console.log('✅ Emotion data received from client:', emotions.length, 'entries');
+    } else {
+      console.log('📝 No emotion payload found, running demo emotion analysis');
+      emotionAnalysis = simulateEmotionAnalysis();
+    }
     
     // 5. Generate feedback
     const feedback = generateFeedback(speechAnalysis, emotionAnalysis);

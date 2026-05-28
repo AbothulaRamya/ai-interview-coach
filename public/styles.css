@@ -306,6 +306,7 @@ body {
     gap: 1rem;
     margin-top: 0.5rem;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .detection-item {
@@ -318,6 +319,83 @@ body {
     color: #667eea;
     font-weight: 500;
     font-size: 0.9rem;
+}
+
+.setup-warnings {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(229, 231, 235, 1);
+    color: #4a5568;
+    font-weight: 600;
+    min-width: 220px;
+    justify-content: center;
+}
+
+.status-chip.active {
+    background: rgba(72, 187, 120, 0.12);
+    border-color: rgba(72, 187, 120, 0.4);
+    color: #276749;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.question-counter {
+    font-size: 1rem;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.question-status {
+    background: rgba(102, 126, 234, 0.12);
+    color: #2c5282;
+    border-radius: 999px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    min-width: 160px;
+    text-align: center;
+}
+
+.progress-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.progress-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.progress-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(226, 232, 240, 1);
+    transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+    width: 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 0 12px rgba(102, 126, 234, 0.4);
 }
 
 .detection-indicator {
@@ -365,12 +443,7 @@ body {
     padding: 2rem;
     margin-bottom: 2rem;
     text-align: center;
-}
-
-.question-section h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2d3748;
+        transition: all 0.3s ease;
     margin-bottom: 1rem;
 }
 
@@ -647,6 +720,11 @@ body {
     color: #2d3748;
     margin-bottom: 1.5rem;
     text-align: center;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 320px !important;
 }
 
 /* Transcript Section */

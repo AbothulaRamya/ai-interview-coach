@@ -10,7 +10,6 @@ let faceAPILoaded = false;
 let personDetected = false;
 let voiceDetected = false;
 
-// Interview questions
 const questions = [
     "Tell me about yourself and why you're interested in this position.",
     "What are your greatest strengths and how do they apply to this role?",
@@ -23,9 +22,12 @@ const questions = [
 let currentQuestionIndex = 0;
 
 document.addEventListener('DOMContentLoaded', async function() {
-    await initializeCamera();
+    updateQuestionDisplay();
+    renderQuestionProgress();
     setupEventListeners();
+    await initializeCamera();
     faceAPILoaded = await loadFaceAPI();
+    document.getElementById('finish-interview').disabled = true;
 });
 
 async function initializeCamera() {
@@ -48,21 +50,18 @@ async function initializeCamera() {
         const video = document.getElementById('video');
         video.srcObject = stream;
         
-        // Update camera status
         const status = document.getElementById('camera-status');
         status.innerHTML = '<span class="status-indicator"></span>Camera & Microphone Ready';
         
         console.log('✅ Camera and microphone initialized successfully');
-        console.log('👤 Person detection ready');
-        console.log('🎤 Voice recognition ready');
-        
-        // Start person detection
         startPersonDetection();
-        
+        updateLiveStatus('Ready to start', '🟡');
+        updateQuestionStatus('Press Start to begin');
     } catch (error) {
         console.error('❌ Error accessing camera/microphone:', error);
         document.getElementById('camera-status').innerHTML = 
             '<span class="status-indicator" style="background: #e53e3e;"></span>Camera/Microphone Error';
+        updateLiveStatus('Camera unavailable', '⚠️');
     }
 }
 
@@ -75,7 +74,6 @@ function setupEventListeners() {
 
 async function loadFaceAPI() {
     try {
-        // Load face-api.js models with error handling
         console.log('Loading face detection models...');
         
         await Promise.all([
@@ -86,11 +84,9 @@ async function loadFaceAPI() {
         ]);
         
         console.log('✅ Face API models loaded successfully');
-        console.log('🎭 Person recognition and emotion detection ready');
         return true;
     } catch (error) {
         console.warn('⚠️ Face API models not available:', error.message);
-        console.log('📝 Continuing with simulated face detection');
         return false;
     }
 }
@@ -101,17 +97,15 @@ function startInterview() {
         return;
     }
     
-    // Hide setup, show interview interface
     document.querySelector('.interview-setup').style.display = 'none';
     document.getElementById('interview-active').style.display = 'block';
+    document.getElementById('processing-section').style.display = 'none';
     
-    // Start recording
+    updateQuestionStatus('Recording your response');
+    updateLiveStatus('Recording', '🔴');
+    
     startRecording();
-    
-    // Start timer
     startTimer();
-    
-    // Start emotion detection
     startEmotionDetection();
     
     console.log('Interview started');
@@ -121,7 +115,6 @@ function startRecording() {
     try {
         console.log('🎤 Starting voice recording...');
         
-        // Check if audio is available
         const audioTracks = stream.getAudioTracks();
         if (audioTracks.length === 0) {
             console.warn('⚠️ No audio track available');
@@ -140,6 +133,7 @@ function startRecording() {
         });
         
         recordedChunks = [];
+        emotionData = [];
         
         mediaRecorder.ondataavailable = function(event) {
             if (event.data.size > 0) {
@@ -150,22 +144,25 @@ function startRecording() {
         
         mediaRecorder.onstop = function() {
             console.log('🛑 Recording stopped');
-            console.log('📊 Total chunks recorded:', recordedChunks.length);
         };
         
         mediaRecorder.onerror = function(event) {
             console.error('❌ Recording error:', event.error);
         };
         
-        mediaRecorder.start(1000); // Record in 1-second chunks
+        mediaRecorder.start(1000);
         isRecording = true;
         
-        // Update button states
         document.getElementById('start-interview').disabled = true;
         document.getElementById('stop-interview').disabled = false;
+        document.getElementById('finish-interview').disabled = true;
+        
+        const recordingVideo = document.getElementById('recording-video');
+        recordingVideo.srcObject = stream;
+        
+        updateQuestionDisplay();
         
         console.log('✅ Voice recording started successfully');
-        
     } catch (error) {
         console.error('❌ Error starting recording:', error);
         alert('Failed to start recording. Please check your camera and microphone permissions.');
@@ -189,7 +186,6 @@ function updateTimer() {
 function startPersonDetection() {
     const video = document.getElementById('video');
     
-    // Detect person every 1 second
     const personInterval = setInterval(async () => {
         if (!video.srcObject) {
             clearInterval(personInterval);
@@ -202,19 +198,10 @@ function startPersonDetection() {
                     .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks();
                 
-                if (detections.length > 0) {
-                    personDetected = true;
-                    console.log('👤 Person detected:', detections.length, 'face(s)');
-                    updatePersonStatus(true);
-                } else {
-                    personDetected = false;
-                    console.log('👤 No person detected');
-                    updatePersonStatus(false);
-                }
+                personDetected = detections.length > 0;
+                updatePersonStatus(personDetected);
             } else {
-                // Simulate person detection
                 personDetected = true;
-                console.log('👤 Person detection (simulated)');
                 updatePersonStatus(true);
             }
         } catch (error) {
@@ -229,7 +216,6 @@ function startEmotionDetection() {
     const video = document.getElementById('recording-video');
     video.srcObject = stream;
     
-    // Detect emotions every 2 seconds
     const emotionInterval = setInterval(async () => {
         if (!isRecording) {
             clearInterval(emotionInterval);
@@ -258,7 +244,6 @@ function startEmotionDetection() {
                     console.log('🎭 Emotion detected:', dominantEmotion, expressions[dominantEmotion]);
                 }
             } else {
-                // Simulate emotion detection
                 const emotions = ['confident', 'focused', 'happy', 'neutral'];
                 const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
                 const confidence = Math.random() * 0.4 + 0.6;
@@ -278,10 +263,15 @@ function startEmotionDetection() {
 }
 
 function nextQuestion() {
-    currentQuestionIndex++;
+    if (!isRecording) {
+        alert('Start the interview to move to the next question.');
+        return;
+    }
     
-    if (currentQuestionIndex < questions.length) {
-        document.getElementById('current-question').textContent = questions[currentQuestionIndex];
+    if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        updateQuestionDisplay();
+        updateQuestionStatus('New question ready');
     } else {
         finishInterview();
     }
@@ -292,15 +282,14 @@ function stopInterview() {
         mediaRecorder.stop();
         isRecording = false;
         
-        // Stop timer
         if (timerInterval) {
             clearInterval(timerInterval);
         }
         
-        // Update button states
         document.getElementById('stop-interview').disabled = true;
         document.getElementById('finish-interview').disabled = false;
-        
+        updateQuestionStatus('Recording paused');
+        updateLiveStatus('Paused', '🟡');
         console.log('Interview stopped');
     }
 }
@@ -310,15 +299,41 @@ async function finishInterview() {
         stopInterview();
     }
     
-    // Hide interview interface, show processing
+    if (recordedChunks.length === 0) {
+        alert('No recording was captured. Please restart the interview and allow recording.');
+        return;
+    }
+    
     document.getElementById('interview-active').style.display = 'none';
     document.getElementById('processing-section').style.display = 'block';
+    updateQuestionStatus('Analyzing your video');
+    updateLiveStatus('Processing', '🧠');
     
-    // Simulate processing steps
     simulateProcessingSteps();
-    
-    // Process the video
     await processInterview();
+}
+
+function updateQuestionDisplay() {
+    const questionText = questions[currentQuestionIndex];
+    document.getElementById('current-question').textContent = questionText;
+    document.getElementById('question-counter').textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+    renderQuestionProgress();
+}
+
+function renderQuestionProgress() {
+    const progressContainer = document.getElementById('question-progress');
+    if (!progressContainer) return;
+    progressContainer.innerHTML = questions.map((_, index) => {
+        const active = index <= currentQuestionIndex ? 'active' : '';
+        return `<span class="progress-dot ${active}"></span>`;
+    }).join('');
+}
+
+function updateQuestionStatus(message) {
+    const statusElement = document.getElementById('question-status');
+    if (statusElement) {
+        statusElement.textContent = message;
+    }
 }
 
 function simulateProcessingSteps() {
@@ -327,37 +342,30 @@ function simulateProcessingSteps() {
     
     const stepInterval = setInterval(() => {
         if (currentStep < steps.length) {
-            // Remove active class from all steps
             steps.forEach(step => {
-                document.getElementById(step).classList.remove('active');
+                const stepEl = document.getElementById(step);
+                if (stepEl) stepEl.classList.remove('active');
             });
-            
-            // Add active class to current step
-            document.getElementById(steps[currentStep]).classList.add('active');
+            const currentStepEl = document.getElementById(steps[currentStep]);
+            if (currentStepEl) currentStepEl.classList.add('active');
             currentStep++;
         } else {
             clearInterval(stepInterval);
         }
-    }, 2000);
+    }, 1700);
 }
 
 async function processInterview() {
     try {
-        // Create blob from recorded chunks
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        
-        // Create form data
         const formData = new FormData();
         formData.append('video', blob, 'interview.webm');
-        
-        // Add emotion data if available
         if (emotionData.length > 0) {
             formData.append('emotionData', JSON.stringify(emotionData));
         }
         
         console.log('Uploading video for analysis...');
         
-        // Send to backend for analysis
         const response = await fetch('/api/analyze', {
             method: 'POST',
             body: formData
@@ -367,21 +375,16 @@ async function processInterview() {
         
         if (result.success) {
             console.log('Analysis completed:', result);
-            // Redirect to results page
             window.location.href = `/results/${result.interviewId}`;
         } else {
             throw new Error(result.error || 'Analysis failed');
         }
-        
     } catch (error) {
         console.error('Error processing interview:', error);
-        
-        // Show error message
         document.querySelector('.processing-animation h3').textContent = 'Analysis Failed';
         document.querySelector('.processing-animation p').textContent = 
             'There was an error analyzing your interview. Please try again.';
         
-        // Add retry button
         setTimeout(() => {
             const retryButton = document.createElement('button');
             retryButton.textContent = 'Try Again';
@@ -392,16 +395,17 @@ async function processInterview() {
     }
 }
 
-// Status update functions
 function updatePersonStatus(detected) {
     const statusElement = document.getElementById('person-status');
     if (statusElement) {
         if (detected) {
             statusElement.classList.add('active');
             statusElement.classList.remove('inactive');
+            statusElement.textContent = '👤';
         } else {
             statusElement.classList.add('inactive');
             statusElement.classList.remove('active');
+            statusElement.textContent = '🚫';
         }
     }
 }
@@ -412,14 +416,27 @@ function updateVoiceStatus(detected) {
         if (detected) {
             statusElement.classList.add('active');
             statusElement.classList.remove('inactive');
+            statusElement.textContent = '🎤';
         } else {
             statusElement.classList.add('inactive');
             statusElement.classList.remove('active');
+            statusElement.textContent = '🔇';
         }
     }
 }
 
-// Clean up when page is unloaded
+function updateLiveStatus(label, symbol) {
+    const liveStatus = document.getElementById('live-status');
+    if (liveStatus) {
+        liveStatus.innerHTML = `<span>${symbol}</span> ${label}`;
+        if (label.toLowerCase().includes('recording')) {
+            liveStatus.classList.add('active');
+        } else {
+            liveStatus.classList.remove('active');
+        }
+    }
+}
+
 window.addEventListener('beforeunload', function() {
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
