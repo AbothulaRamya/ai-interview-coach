@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Results - AI Interview Coach</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>🎯 AI Interview Coach</h1>
+                <a href="/" class="back-link">← Back to Home</a>
+            </div>
+        </header>
+
+        <main class="results-container">
+            <div class="results-header">
+                <h2>Your Interview Analysis</h2>
+                <p>Here's your detailed performance breakdown and feedback</p>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading your results...</p>
+            </div>
+
+            <div class="results-content" id="results-content" style="display: none;">
+                <!-- Overall Score -->
+                <section class="score-section">
+                    <div class="overall-score">
+                        <div class="score-circle">
+                            <div class="score-number" id="overall-score">0</div>
+                            <div class="score-label">Overall Score</div>
+                        </div>
+                        <div class="score-breakdown">
+                            <div class="score-item">
+                                <span class="score-label">Speech Clarity</span>
+                                <div class="score-bar">
+                                    <div class="score-fill" id="clarity-bar"></div>
+                                    <span class="score-value" id="clarity-score">0/100</span>
+                                </div>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">Confidence</span>
+                                <div class="score-bar">
+                                    <div class="score-fill" id="confidence-bar"></div>
+                                    <span class="score-value" id="confidence-score">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Metrics Grid -->
+                <section class="metrics-section">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">🎤</div>
+                            <div class="metric-value" id="speech-rate">0</div>
+                            <div class="metric-label">Words per Minute</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">🤐</div>
+                            <div class="metric-value" id="filler-words">0</div>
+                            <div class="metric-label">Filler Words</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">⏸️</div>
+                            <div class="metric-value" id="pause-count">0</div>
+                            <div class="metric-label">Pauses</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">⏱️</div>
+                            <div class="metric-value" id="duration">0s</div>
+                            <div class="metric-label">Duration</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <div class="chart-container">
+                        <h3>Emotion Timeline</h3>
+                        <canvas id="emotion-chart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Transcript Section -->
+                <section class="transcript-section">
+                    <h3>Your Response</h3>
+                    <div class="transcript-box">
+                        <p id="transcript-text">Loading transcript...</p>
+                    </div>
+                </section>
+
+                <!-- Feedback Section -->
+                <section class="feedback-section">
+                    <div class="feedback-grid">
+                        <div class="feedback-card strengths">
+                            <h3>✅ Strengths</h3>
+                            <ul id="strengths-list">
+                                <li>Loading...</li>
+                            </ul>
+                        </div>
+                        <div class="feedback-card improvements">
+                            <h3>🎯 Areas for Improvement</h3>
+                            <ul id="improvements-list">
+                                <li>Loading...</li>
+                            </ul>
+                        </div>
+                        <div class="feedback-card tips">
+                            <h3>💡 Tips for Next Time</h3>
+                            <ul id="tips-list">
+                                <li>Loading...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Action Buttons -->
+                <section class="actions-section">
+                    <a href="/interview" class="primary-button">
+                        Take Another Interview
+                    </a>
+                    <button id="share-results" class="secondary-button">
+                        Share Results
+                    </button>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="results.js"></script>
+</body>
+</html>

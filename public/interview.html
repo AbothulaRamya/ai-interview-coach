@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Interview - AI Interview Coach</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>🎯 AI Interview Coach</h1>
+                <a href="/" class="back-link">← Back to Home</a>
+            </div>
+        </header>
+
+        <main class="interview-container">
+            <div class="interview-setup">
+                <h2>Mock Interview Setup</h2>
+                <p>Get ready for your interview! Make sure you have good lighting and a quiet environment.</p>
+                
+                <div class="camera-preview">
+                    <video id="video" autoplay muted playsinline></video>
+                    <div id="camera-status" class="camera-status">
+                        <span class="status-indicator"></span>
+                        Camera Ready
+                    </div>
+                    <div id="detection-status" class="detection-status">
+                        <div class="detection-item">
+                            <span id="person-status" class="detection-indicator">👤</span>
+                            <span>Person Detection</span>
+                        </div>
+                        <div class="detection-item">
+                            <span id="voice-status" class="detection-indicator">🎤</span>
+                            <span>Voice Recognition</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interview-controls">
+                    <button id="start-interview" class="primary-button">
+                        Start Interview
+                    </button>
+                    <button id="stop-interview" class="danger-button" disabled>
+                        Stop Interview
+                    </button>
+                </div>
+            </div>
+
+            <div class="interview-active" id="interview-active" style="display: none;">
+                <div class="question-section">
+                    <h3>Interview Question</h3>
+                    <div class="question-box">
+                        <p id="current-question">Tell me about yourself and why you're interested in this position.</p>
+                    </div>
+                    <div class="timer">
+                        <span id="timer-display">00:00</span>
+                    </div>
+                </div>
+
+                <div class="recording-section">
+                    <div class="recording-indicator">
+                        <div class="recording-dot"></div>
+                        <span>Recording in progress...</span>
+                    </div>
+                    
+                    <div class="video-container">
+                        <video id="recording-video" autoplay muted playsinline></video>
+                        <canvas id="emotion-canvas" style="display: none;"></canvas>
+                    </div>
+                </div>
+
+                <div class="interview-actions">
+                    <button id="next-question" class="secondary-button">
+                        Next Question
+                    </button>
+                    <button id="finish-interview" class="primary-button">
+                        Finish Interview
+                    </button>
+                </div>
+            </div>
+
+            <div class="processing-section" id="processing-section" style="display: none;">
+                <div class="processing-animation">
+                    <div class="spinner"></div>
+                    <h3>Analyzing Your Interview...</h3>
+                    <p>Our AI is processing your video and audio to provide detailed feedback.</p>
+                    <div class="processing-steps">
+                        <div class="step active" id="step-1">
+                            <span class="step-icon">🎤</span>
+                            <span>Transcribing speech...</span>
+                        </div>
+                        <div class="step" id="step-2">
+                            <span class="step-icon">🧠</span>
+                            <span>Analyzing speech patterns...</span>
+                        </div>
+                        <div class="step" id="step-3">
+                            <span class="step-icon">😊</span>
+                            <span>Detecting emotions...</span>
+                        </div>
+                        <div class="step" id="step-4">
+                            <span class="step-icon">📊</span>
+                            <span>Generating feedback...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Face-api.js models -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script src="interview.js"></script>
+</body>
+</html>
