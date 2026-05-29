@@ -78,12 +78,15 @@ Update `.env` with your settings:
 OPENAI_API_KEY=your_openai_api_key_here
 
 # MongoDB Configuration
+# Use MongoDB Atlas or local MongoDB.
 MONGODB_URI=mongodb://localhost:27017/interviewCoach
 
 # Server Configuration
 PORT=5000
 NODE_ENV=development
 ```
+
+> Tip: Use `npm run setup` to build `.env` interactively, including Atlas and OpenAI values.
 
 ### 3. Start the Application
 

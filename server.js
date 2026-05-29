@@ -16,10 +16,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/interviewCoach';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configure multer for file uploads
@@ -42,11 +45,13 @@ const upload = multer({
 // Connect to MongoDB with timeout
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/interviewCoach', {
+    await mongoose.connect(MONGODB_URI, {
       serverSelectionTimeoutMS: 5000, // 5 second timeout
       connectTimeoutMS: 5000,
     });
     console.log('✅ Connected to MongoDB');
+    const dbType = MONGODB_URI.includes('mongodb+srv') ? 'MongoDB Atlas' : 'Local MongoDB';
+    console.log(`📦 Using ${dbType}`);
   } catch (err) {
     console.warn('⚠️  MongoDB connection failed:', err.message);
     console.log('📝 Running in demo mode - data will not be persisted');
@@ -59,6 +64,15 @@ connectDB();
 // Routes
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    environment: NODE_ENV,
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.get('/interview', (req, res) => {
